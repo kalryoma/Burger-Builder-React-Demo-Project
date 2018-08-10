@@ -3,18 +3,26 @@ import React from "react";
 import css from "./SideDrawer.css";
 import Logo from "../../Logo/Logo";
 import NavItems from "../NavItems/NavItems";
+import Backdrop from "../../UI/Backdrop/Backdrop";
 
 const sideDrawer = props => {
-  return (
-    <div className={css.SideDrawer}>
-      <div className={css.Logo}>
-        <Logo />
+  let sideClass = [css.SideDrawer];
+  if (props.open)
+    sideClass.push(css.Open);
+  else
+    sideClass.push(css.Close);
+
+  return <React.Fragment>
+      <Backdrop show={props.open} clicked={props.toggleSideDrawer} />
+      <div className={sideClass.join(" ")}>
+        <div className={css.Logo}>
+          <Logo />
+        </div>
+        <nav>
+          <NavItems />
+        </nav>
       </div>
-      <nav>
-        <NavItems />
-      </nav>
-    </div>
-  );
+    </React.Fragment>;
 };
 
 export default sideDrawer;
