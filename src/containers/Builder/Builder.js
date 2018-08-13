@@ -19,17 +19,30 @@ class Builder extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ingredients: {
-        meat: 0,
-        cheese: 0,
-        salad: 0,
-        bacon: 0
-      },
+      ingredients: null,
       totoalPrice: 4,
       purchasable: false,
       purchasing: false,
-      loading: false
+      loading: false,
+      error: null
     };
+  }
+
+  componentDidMount() {
+    axios.get("/ingredients.json")
+      .then(res => {
+        this.setState({ingredients: res.data, totoalPrice: this.calcPrice(res.data)});
+      })
+      .catch (err => {
+        this.setState({error: err});
+      });
+  }
+
+  calcPrice = ingredients => {
+    let sum=4;
+    for (let key in ingredients)
+      sum += ingredients[key] * INGREDIENT_PRICES[key];
+    return sum;
   }
 
   updataPurchaseState = ingredients => {
@@ -78,23 +91,37 @@ class Builder extends Component {
   };
 
   render() {
-    const disabledCtrls = { ...this.state.ingredients };
-    let orderSummary = (
-      <OrderSummary
-        ingredients={this.state.ingredients}
-        cancel={this.purchaseCancelHandler}
-        continue={this.purchaseContinueHandler}
-        price={this.state.totoalPrice}
-      />
-    );
-    if (this.state.loading) orderSummary = <Spinner />;
-    for (let key in disabledCtrls) disabledCtrls[key] = disabledCtrls[key] <= 0;
+    let disabledCtrls={
+      meat: true,
+      salad: true,
+      bacon: true,
+      cheese: true
+    };
+    let orderSummary=null;
+    let burger=null;
+    if (this.state.ingredients){
+      disabledCtrls = { ...this.state.ingredients };
+      orderSummary = (
+        <OrderSummary
+          ingredients={this.state.ingredients}
+          cancel={this.purchaseCancelHandler}
+          continue={this.purchaseContinueHandler}
+          price={this.state.totoalPrice}
+          />
+        );
+        burger = <Burger ingredients={this.state.ingredients} />
+        if (this.state.loading) orderSummary = <Spinner />;
+      for (let key in disabledCtrls) disabledCtrls[key] = disabledCtrls[key] <= 0;
+    }
+    else{
+      burger = this.state.error ? <p>Can't load Ingredients! {this.state.error.message}</p> : <Spinner />;
+    }
     return (
       <React.Fragment>
         <Modal show={this.state.purchasing} cancel={this.purchaseCancelHandler}>
           {orderSummary}
         </Modal>
-        <Burger ingredients={this.state.ingredients} />
+        {burger}
         <Controls
           addHandler={this.addIngredient}
           removeHandler={this.removeIngredient}
