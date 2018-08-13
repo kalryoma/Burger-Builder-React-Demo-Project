@@ -4,6 +4,9 @@ import Burger from "../../components/Burger/Burger";
 import Controls from "../../components/Burger/Controls/Controls";
 import Modal from "../../components/UI/Modal/Modal";
 import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary";
+import axios from "../../axios";
+import Spinner from "../../components/UI/Spinner/Spinner";
+import ErrorHandler from "../../hoc/ErrorHandler/ErrorHandler";
 
 const INGREDIENT_PRICES = {
   meat: 1.3,
@@ -24,7 +27,8 @@ class Builder extends Component {
       },
       totoalPrice: 4,
       purchasable: false,
-      purchasing: false
+      purchasing: false,
+      loading: false
     };
   }
 
@@ -41,7 +45,19 @@ class Builder extends Component {
   };
 
   purchaseContinueHandler = () => {
-    alert("continue");
+    this.setState({ loading: true });
+    const order = {
+      ingredients: this.state.ingredients,
+      price: this.state.totoalPrice
+    };
+    axios.post("/order.json", order).then(
+      res => {
+        this.setState({ loading: false, purchasing: false });
+      },
+      err => {
+        this.setState({ loading: false, purchasing: false });
+      }
+    );
   };
 
   addIngredient = type => {
@@ -63,16 +79,20 @@ class Builder extends Component {
 
   render() {
     const disabledCtrls = { ...this.state.ingredients };
+    let orderSummary = (
+      <OrderSummary
+        ingredients={this.state.ingredients}
+        cancel={this.purchaseCancelHandler}
+        continue={this.purchaseContinueHandler}
+        price={this.state.totoalPrice}
+      />
+    );
+    if (this.state.loading) orderSummary = <Spinner />;
     for (let key in disabledCtrls) disabledCtrls[key] = disabledCtrls[key] <= 0;
     return (
       <React.Fragment>
         <Modal show={this.state.purchasing} cancel={this.purchaseCancelHandler}>
-          <OrderSummary
-            ingredients={this.state.ingredients}
-            cancel={this.purchaseCancelHandler}
-            continue={this.purchaseContinueHandler}
-            price={this.state.totoalPrice}
-          />
+          {orderSummary}
         </Modal>
         <Burger ingredients={this.state.ingredients} />
         <Controls
@@ -88,4 +108,4 @@ class Builder extends Component {
   }
 }
 
-export default Builder;
+export default ErrorHandler(Builder, axios);
