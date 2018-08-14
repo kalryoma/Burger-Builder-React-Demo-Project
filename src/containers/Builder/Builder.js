@@ -65,21 +65,6 @@ class Builder extends Component {
   };
 
   purchaseContinueHandler = () => {
-    // this.setState({ loading: true });
-    // const order = {
-    //   ingredients: this.state.ingredients,
-    //   price: this.state.totoalPrice
-    // };
-    // axios.post("/order.json", order).then(
-    //   res => {
-    //     this.setState({ loading: false, purchasing: false });
-    //     this.props.history.push("/checkout");
-    //   },
-    //   err => {
-    //     this.setState({ loading: false, purchasing: false });
-    //     this.props.history.push("/checkout");
-    //   }
-    // );
     let queryParam = [];
     for (let key in this.state.ingredients)
       queryParam.push(
@@ -87,6 +72,7 @@ class Builder extends Component {
           "=" +
           encodeURIComponent(this.state.ingredients[key])
       );
+    queryParam.push(encodeURIComponent("price")+"="+encodeURIComponent(this.state.totoalPrice));
     this.props.history.push({
       pathname: "/checkout",
       search: "?" + queryParam.join("&")
