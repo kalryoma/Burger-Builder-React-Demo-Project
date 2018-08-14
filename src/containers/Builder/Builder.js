@@ -29,21 +29,28 @@ class Builder extends Component {
   }
 
   componentDidMount() {
-    axios.get("/ingredients.json")
+    axios
+      .get("/ingredients.json")
       .then(res => {
-        this.setState({ingredients: res.data, totoalPrice: this.calcPrice(res.data)});
+        this.setState({
+          ingredients: res.data,
+          totoalPrice: this.calcPrice(res.data),
+          purchasable: this.updataPurchaseState(res.data)
+        });
       })
-      .catch (err => {
-        this.setState({error: err});
+      .catch(err => {
+        this.setState({ error: err });
       });
   }
 
+  componentWillUnmount() {}
+
   calcPrice = ingredients => {
-    let sum=4;
+    let sum = 4;
     for (let key in ingredients)
       sum += ingredients[key] * INGREDIENT_PRICES[key];
     return sum;
-  }
+  };
 
   updataPurchaseState = ingredients => {
     return 0 !== Object.values(ingredients).reduce((a, b) => a + b, 0);
@@ -58,19 +65,32 @@ class Builder extends Component {
   };
 
   purchaseContinueHandler = () => {
-    this.setState({ loading: true });
-    const order = {
-      ingredients: this.state.ingredients,
-      price: this.state.totoalPrice
-    };
-    axios.post("/order.json", order).then(
-      res => {
-        this.setState({ loading: false, purchasing: false });
-      },
-      err => {
-        this.setState({ loading: false, purchasing: false });
-      }
-    );
+    // this.setState({ loading: true });
+    // const order = {
+    //   ingredients: this.state.ingredients,
+    //   price: this.state.totoalPrice
+    // };
+    // axios.post("/order.json", order).then(
+    //   res => {
+    //     this.setState({ loading: false, purchasing: false });
+    //     this.props.history.push("/checkout");
+    //   },
+    //   err => {
+    //     this.setState({ loading: false, purchasing: false });
+    //     this.props.history.push("/checkout");
+    //   }
+    // );
+    let queryParam = [];
+    for (let key in this.state.ingredients)
+      queryParam.push(
+        encodeURIComponent(key) +
+          "=" +
+          encodeURIComponent(this.state.ingredients[key])
+      );
+    this.props.history.push({
+      pathname: "/checkout",
+      search: "?" + queryParam.join("&")
+    });
   };
 
   addIngredient = type => {
@@ -91,15 +111,15 @@ class Builder extends Component {
   };
 
   render() {
-    let disabledCtrls={
+    let disabledCtrls = {
       meat: true,
       salad: true,
       bacon: true,
       cheese: true
     };
-    let orderSummary=null;
-    let burger=null;
-    if (this.state.ingredients){
+    let orderSummary = null;
+    let burger = null;
+    if (this.state.ingredients) {
       disabledCtrls = { ...this.state.ingredients };
       orderSummary = (
         <OrderSummary
@@ -107,14 +127,18 @@ class Builder extends Component {
           cancel={this.purchaseCancelHandler}
           continue={this.purchaseContinueHandler}
           price={this.state.totoalPrice}
-          />
-        );
-        burger = <Burger ingredients={this.state.ingredients} />
-        if (this.state.loading) orderSummary = <Spinner />;
-      for (let key in disabledCtrls) disabledCtrls[key] = disabledCtrls[key] <= 0;
-    }
-    else{
-      burger = this.state.error ? <p>Can't load Ingredients! {this.state.error.message}</p> : <Spinner />;
+        />
+      );
+      burger = <Burger ingredients={this.state.ingredients} />;
+      if (this.state.loading) orderSummary = <Spinner />;
+      for (let key in disabledCtrls)
+        disabledCtrls[key] = disabledCtrls[key] <= 0;
+    } else {
+      burger = this.state.error ? (
+        <p>Can't load Ingredients! {this.state.error.message}</p>
+      ) : (
+        <Spinner />
+      );
     }
     return (
       <React.Fragment>
