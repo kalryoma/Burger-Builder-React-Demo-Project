@@ -28,11 +28,11 @@ class ContactData extends Component {
     axios.post("/order.json", order).then(
       res => {
         this.setState({ loading: false});
-        this.props.history.push("/");
+        this.props.history.push("/orders");
       },
       err => {
         this.setState({ loading: false});
-        this.props.history.push("/");
+        this.props.history.push("/orders");
       }
     );
   };
