@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 
 import Burger from "../../components/Burger/Burger";
 import Controls from "../../components/Burger/Controls/Controls";
@@ -7,20 +8,13 @@ import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary";
 import axios from "../../axios";
 import Spinner from "../../components/UI/Spinner/Spinner";
 import ErrorHandler from "../../hoc/ErrorHandler/ErrorHandler";
+import * as actionTypes from "../../store/actions";
 
-const INGREDIENT_PRICES = {
-  meat: 1.3,
-  cheese: 0.4,
-  salad: 0.5,
-  bacon: 0.7
-};
 
 class Builder extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ingredients: null,
-      totoalPrice: 4,
       purchasable: false,
       purchasing: false,
       loading: false,
@@ -29,28 +23,28 @@ class Builder extends Component {
   }
 
   componentDidMount() {
-    axios
-      .get("/ingredients.json")
-      .then(res => {
-        this.setState({
-          ingredients: res.data,
-          totoalPrice: this.calcPrice(res.data),
-          purchasable: this.updataPurchaseState(res.data)
-        });
-      })
-      .catch(err => {
-        this.setState({ error: err });
-      });
+    // axios
+    //   .get("/ingredients.json")
+    //   .then(res => {
+    //     this.setState({
+    //       ingredients: res.data,
+    //       totalPrice: this.calcPrice(res.data),
+    //       purchasable: this.updataPurchaseState(res.data)
+    //     });
+    //   })
+    //   .catch(err => {
+    //     this.setState({ error: err });
+    //   });
   }
 
   componentWillUnmount() {}
 
-  calcPrice = ingredients => {
-    let sum = 4;
-    for (let key in ingredients)
-      sum += ingredients[key] * INGREDIENT_PRICES[key];
-    return sum;
-  };
+  // calcPrice = ingredients => {
+  //   let sum = 4;
+  //   for (let key in ingredients)
+  //     sum += ingredients[key] * INGREDIENT_PRICES[key];
+  //   return sum;
+  // };
 
   updataPurchaseState = ingredients => {
     return 0 !== Object.values(ingredients).reduce((a, b) => a + b, 0);
@@ -65,35 +59,7 @@ class Builder extends Component {
   };
 
   purchaseContinueHandler = () => {
-    let queryParam = [];
-    for (let key in this.state.ingredients)
-      queryParam.push(
-        encodeURIComponent(key) +
-          "=" +
-          encodeURIComponent(this.state.ingredients[key])
-      );
-    queryParam.push(encodeURIComponent("price")+"="+encodeURIComponent(this.state.totoalPrice));
-    this.props.history.push({
-      pathname: "/checkout",
-      search: "?" + queryParam.join("&")
-    });
-  };
-
-  addIngredient = type => {
-    const newState = { ...this.state };
-    newState.ingredients[type] += 1;
-    newState.totoalPrice += INGREDIENT_PRICES[type];
-    newState.purchasable = this.updataPurchaseState(newState.ingredients);
-    this.setState(newState);
-  };
-
-  removeIngredient = type => {
-    const newState = { ...this.state };
-    if (newState.ingredients[type] - 1 < 0) return;
-    newState.ingredients[type] -= 1;
-    newState.totoalPrice -= INGREDIENT_PRICES[type];
-    newState.purchasable = this.updataPurchaseState(newState.ingredients);
-    this.setState(newState);
+    this.props.history.push("/checkout");
   };
 
   render() {
@@ -105,17 +71,17 @@ class Builder extends Component {
     };
     let orderSummary = null;
     let burger = null;
-    if (this.state.ingredients) {
-      disabledCtrls = { ...this.state.ingredients };
+    if (this.props.ings) {
+      disabledCtrls = { ...this.props.ings };
       orderSummary = (
         <OrderSummary
-          ingredients={this.state.ingredients}
+          ingredients={this.props.ings}
           cancel={this.purchaseCancelHandler}
           continue={this.purchaseContinueHandler}
-          price={this.state.totoalPrice}
+          price={this.props.price}
         />
       );
-      burger = <Burger ingredients={this.state.ingredients} />;
+      burger = <Burger ingredients={this.props.ings} />;
       if (this.state.loading) orderSummary = <Spinner />;
       for (let key in disabledCtrls)
         disabledCtrls[key] = disabledCtrls[key] <= 0;
@@ -133,11 +99,11 @@ class Builder extends Component {
         </Modal>
         {burger}
         <Controls
-          addHandler={this.addIngredient}
-          removeHandler={this.removeIngredient}
+          addHandler={this.props.onIngredientAdded}
+          removeHandler={this.props.onIngredientRemoved}
           disabled={disabledCtrls}
-          price={this.state.totoalPrice}
-          purchasable={this.state.purchasable}
+          price={this.props.price}
+          purchasable={this.updataPurchaseState(this.props.ings)}
           orderClicked={this.purchaseHandler}
         />
       </React.Fragment>
@@ -145,4 +111,26 @@ class Builder extends Component {
   }
 }
 
-export default ErrorHandler(Builder, axios);
+const mapStateToProps = state => {
+  return {
+    ings: state.ingredients,
+    price: state.totalPrice
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onIngredientAdded: ingreName =>
+      dispatch({
+        type: actionTypes.ADD_INGREDIENT,
+        ingreName: ingreName
+      }),
+    onIngredientRemoved: ingreName =>
+      dispatch({
+        type: actionTypes.REMOVE_INGREDIENT,
+        ingreName: ingreName
+      })
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ErrorHandler(Builder, axios));
