@@ -13,6 +13,12 @@ const initalState = {
   error: false
 };
 
+function calcPrice(ingredients) {
+  let sum = 4;
+  for (let key in ingredients) sum += ingredients[key] * INGREDIENT_PRICES[key];
+  return sum;
+}
+
 const reducer = (state = initalState, action) => {
   switch (action.type) {
     case actionTypes.ADD_INGREDIENT:
@@ -37,13 +43,14 @@ const reducer = (state = initalState, action) => {
       return {
         ...state,
         ingredients: action.ingredients,
+        totalPrice: calcPrice(action.ingredients),
         error: false
-      }
+      };
     case actionTypes.FETCH_INGREDIENTS_FAILED:
       return {
         ...state,
         error: true
-      }
+      };
     default:
       return state;
   }

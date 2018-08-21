@@ -5,23 +5,15 @@ import css from "./Input.css";
 const input = props => {
   let inputElement = null;
   let classes = [css.InputElement];
-  if (!props.valid && props.shouldValidate && props.touched)
+  if (!props.valid && props.touched)
     classes.push(css.Invalid);
   switch (props.inputtype) {
     case "input":
       inputElement = (
         <input
           className={classes.join(" ")}
-          {...props}
-          onChange={props.changed}
-        />
-      );
-      break;
-    case "textarea":
-      inputElement = (
-        <textarea
-          className={classes.join(" ")}
-          {...props}
+          type={props.type}
+          placeholder={props.placeholder}
           onChange={props.changed}
         />
       );

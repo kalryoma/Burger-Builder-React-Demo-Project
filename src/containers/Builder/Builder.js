@@ -8,7 +8,7 @@ import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary";
 import axios from "../../axios";
 import Spinner from "../../components/UI/Spinner/Spinner";
 import ErrorHandler from "../../hoc/ErrorHandler/ErrorHandler";
-import * as builderActions from "../../store/actions/index";
+import * as actions from "../../store/actions/index";
 
 class Builder extends Component {
   constructor(props) {
@@ -23,15 +23,6 @@ class Builder extends Component {
     this.props.onInitIngredients();
   }
 
-  componentWillUnmount() {}
-
-  // calcPrice = ingredients => {
-  //   let sum = 4;
-  //   for (let key in ingredients)
-  //     sum += ingredients[key] * INGREDIENT_PRICES[key];
-  //   return sum;
-  // };
-
   updataPurchaseState = ingredients => {
     return ingredients && 0 !== Object.values(ingredients).reduce((a, b) => a + b, 0);
   };
@@ -45,6 +36,7 @@ class Builder extends Component {
   };
 
   purchaseContinueHandler = () => {
+    this.props.onInitPurchase();
     this.props.history.push("/checkout");
   };
 
@@ -98,19 +90,20 @@ class Builder extends Component {
 
 const mapStateToProps = state => {
   return {
-    ings: state.ingredients,
-    price: state.totalPrice,
-    error: state.error
+    ings: state.builder.ingredients,
+    price: state.builder.totalPrice,
+    error: state.builder.error
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     onIngredientAdded: ingreName =>
-      dispatch(builderActions.addIngredient(ingreName)),
+      dispatch(actions.addIngredient(ingreName)),
     onIngredientRemoved: ingreName =>
-      dispatch(builderActions.removeIngredient(ingreName)),
-    onInitIngredients: () => dispatch(builderActions.initIngredients())
+      dispatch(actions.removeIngredient(ingreName)),
+    onInitIngredients: () => dispatch(actions.initIngredients()),
+    onInitPurchase: () => dispatch(actions.purchaseInit())
   };
 };
 
