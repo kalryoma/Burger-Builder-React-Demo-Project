@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 
 import Button from "../../../components/UI/Button/Button";
-import axios from "../../../axios";
+import axios from "../../../axiosOwn";
 import css from "./ContactData.css";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import Input from "../../../components/UI/Input/Input";

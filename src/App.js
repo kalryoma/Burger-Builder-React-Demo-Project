@@ -12,9 +12,9 @@ class App extends Component {
       <div>
         <Layout>
           <Switch>
-            <Route path="/" exact component={Builder} />
             <Route path="/checkout" component={CheckOut} />
             <Route path="/orders" component={Orders} />
+            <Route path="/" exact component={Builder} />
             <Route component={Builder} />
           </Switch>
         </Layout>

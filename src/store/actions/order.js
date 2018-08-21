@@ -1,5 +1,5 @@
 import * as actionTypes from "./actionTypes";
-import axios from "../../axios";
+import axios from "../../axiosOwn";
 
 const purchaseSuccess = (id, orderData) => ({
   type: actionTypes.PURCHASE_SUCCESS,
@@ -26,4 +26,28 @@ export const purchase = orderData => dispatch => {
       dispatch(purchaseFail(err));
     }
   );
+};
+
+const fetchOrderSuccess = orders => ({
+  type: actionTypes.FETCH_ORDERS_SUCCESS,
+  orders: orders
+});
+
+const fetchOrderFail = error => ({
+  type: actionTypes.FETCH_ORDERS_FAIL,
+  error: error
+});
+
+const fetchOrderStart = () => ({ type: actionTypes.FETCH_ORDERS_START });
+
+export const fetchOrder = () => dispatch => {
+  dispatch(fetchOrderStart());
+  axios
+    .get("/ordr.json")
+    .then(res => {
+      dispatch(fetchOrderSuccess(res.data));
+    })
+    .catch(err => {
+      dispatch(fetchOrderFail(err));
+    });
 };

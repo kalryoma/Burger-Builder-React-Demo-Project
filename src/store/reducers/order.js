@@ -37,6 +37,27 @@ const reducer = (state = initalState, action) => {
         ...state,
         loading: true
       };
+    case actionTypes.FETCH_ORDERS_START:
+      return {
+        ...state,
+        loading: true
+      };
+    case actionTypes.FETCH_ORDERS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        error: false,
+        orders: Object.keys(action.orders).map(key => ({
+          ...action.orders[key],
+          id: key
+        }))
+      };
+    case actionTypes.FETCH_ORDERS_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: true
+      };
     default:
       return state;
   }

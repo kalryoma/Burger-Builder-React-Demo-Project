@@ -5,7 +5,7 @@ import Burger from "../../components/Burger/Burger";
 import Controls from "../../components/Burger/Controls/Controls";
 import Modal from "../../components/UI/Modal/Modal";
 import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary";
-import axios from "../../axios";
+import axios from "../../axiosOwn";
 import Spinner from "../../components/UI/Spinner/Spinner";
 import ErrorHandler from "../../hoc/ErrorHandler/ErrorHandler";
 import * as actions from "../../store/actions/index";
