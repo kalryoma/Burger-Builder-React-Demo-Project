@@ -43,7 +43,7 @@ const fetchOrderStart = () => ({ type: actionTypes.FETCH_ORDERS_START });
 export const fetchOrder = () => dispatch => {
   dispatch(fetchOrderStart());
   axios
-    .get("/ordr.json")
+    .get("/order.json")
     .then(res => {
       dispatch(fetchOrderSuccess(res.data));
     })

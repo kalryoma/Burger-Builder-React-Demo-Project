@@ -10,12 +10,14 @@ import "./index.css";
 import App from "./App";
 import builderReducer from "./store/reducers/builder";
 import orderReducer from "./store/reducers/order";
+import authReducer from "./store/reducers/auth";
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const rootReducer = combineReducers({
   builder: builderReducer,
-  order: orderReducer
+  order: orderReducer,
+  auth: authReducer
 });
 
 const store = createStore(
