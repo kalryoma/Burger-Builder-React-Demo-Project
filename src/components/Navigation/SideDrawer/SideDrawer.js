@@ -7,22 +7,22 @@ import Backdrop from "../../UI/Backdrop/Backdrop";
 
 const sideDrawer = props => {
   let sideClass = [css.SideDrawer];
-  if (props.open)
-    sideClass.push(css.Open);
-  else
-    sideClass.push(css.Close);
+  if (props.open) sideClass.push(css.Open);
+  else sideClass.push(css.Close);
 
-  return <React.Fragment>
+  return (
+    <React.Fragment>
       <Backdrop show={props.open} clicked={props.toggleSideDrawer} />
       <div className={sideClass.join(" ")}>
         <div className={css.Logo}>
           <Logo />
         </div>
-        <nav>
+        <nav onClick={props.toggleSideDrawer}>
           <NavItems />
         </nav>
       </div>
-    </React.Fragment>;
+    </React.Fragment>
+  );
 };
 
 export default sideDrawer;

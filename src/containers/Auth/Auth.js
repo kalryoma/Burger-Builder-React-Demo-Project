@@ -7,6 +7,7 @@ import Input from "../../components/UI/Input/Input";
 import Spinner from "../../components/UI/Spinner/Spinner";
 import css from "./Auth.css";
 import * as authActions from "../../store/actions/index";
+import { checkValidity } from "../../shared/utility";
 
 class Auth extends Component {
   constructor(props) {
@@ -39,25 +40,12 @@ class Auth extends Component {
       this.props.onSetAuthRedirectPath("/");
   }
 
-  checkValidity(value, rules) {
-    if (!rules) return true;
-
-    let isValid = true;
-
-    if (rules.required) isValid = value.trim() !== "" && isValid;
-    if (rules.minLength) isValid = value.length >= rules.minLength && isValid;
-    if (rules.maxLength) isValid = value.length <= rules.maxLength && isValid;
-    if (rules.isEmail) isValid = value.indexOf("@") !== -1 && isValid;
-
-    return isValid;
-  }
-
   inputChangeHandler = (event, identifier) => {
     const updatedForm = { ...this.state.form };
     const updatedIdentifier = { ...updatedForm[identifier] };
 
     updatedIdentifier.value = event.target.value;
-    updatedIdentifier.valid = this.checkValidity(
+    updatedIdentifier.valid = checkValidity(
       updatedIdentifier.value,
       updatedIdentifier.validation
     );
