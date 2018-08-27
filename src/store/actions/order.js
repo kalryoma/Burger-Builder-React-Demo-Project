@@ -16,9 +16,9 @@ const purchaseStart = () => ({ type: actionTypes.PURCHASE_START });
 
 export const purchaseInit = () => ({ type: actionTypes.PURCHASE_INIT });
 
-export const purchase = orderData => dispatch => {
+export const purchase = (orderData, token) => dispatch => {
   dispatch(purchaseStart());
-  axios.post("/order.json", orderData).then(
+  axios.post("/order.json?auth=" + token, orderData).then(
     res => {
       dispatch(purchaseSuccess(res.data.name, orderData));
     },
@@ -40,10 +40,10 @@ const fetchOrderFail = error => ({
 
 const fetchOrderStart = () => ({ type: actionTypes.FETCH_ORDERS_START });
 
-export const fetchOrder = () => dispatch => {
+export const fetchOrder = token => dispatch => {
   dispatch(fetchOrderStart());
   axios
-    .get("/order.json")
+    .get("/order.json?auth=" + token)
     .then(res => {
       dispatch(fetchOrderSuccess(res.data));
     })

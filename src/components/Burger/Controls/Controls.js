@@ -30,8 +30,12 @@ const controls = props => {
           disabled={props.disabled[ctrl.type]}
         />
       ))}
-      <button className={css.OrderButton} disabled={!props.purchasable} onClick={props.orderClicked}>
-        Order Now
+      <button
+        className={css.OrderButton}
+        disabled={!props.purchasable}
+        onClick={props.orderClicked}
+      >
+        {props.isAuthed ? "Order Now" : "Sign In to Order"}
       </button>
     </div>
   );

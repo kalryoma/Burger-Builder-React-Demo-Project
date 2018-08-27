@@ -24,11 +24,17 @@ class Builder extends Component {
   }
 
   updataPurchaseState = ingredients => {
-    return ingredients && 0 !== Object.values(ingredients).reduce((a, b) => a + b, 0);
+    return (
+      ingredients && 0 !== Object.values(ingredients).reduce((a, b) => a + b, 0)
+    );
   };
 
   purchaseHandler = () => {
-    this.setState({ purchasing: true });
+    if (this.props.isAuthed) this.setState({ purchasing: true });
+    else {
+      this.props.onSetAuthRedirectPath("/checkout");
+      this.props.history.push("/auth");
+    }
   };
 
   purchaseCancelHandler = () => {
@@ -80,6 +86,7 @@ class Builder extends Component {
           removeHandler={this.props.onIngredientRemoved}
           disabled={disabledCtrls}
           price={this.props.price}
+          isAuthed={this.props.isAuthed}
           purchasable={this.updataPurchaseState(this.props.ings)}
           orderClicked={this.purchaseHandler}
         />
@@ -88,24 +95,21 @@ class Builder extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    ings: state.builder.ingredients,
-    price: state.builder.totalPrice,
-    error: state.builder.error
-  };
-};
+const mapStateToProps = state => ({
+  ings: state.builder.ingredients,
+  price: state.builder.totalPrice,
+  error: state.builder.error,
+  isAuthed: state.auth.token !== null
+});
 
-const mapDispatchToProps = dispatch => {
-  return {
-    onIngredientAdded: ingreName =>
-      dispatch(actions.addIngredient(ingreName)),
-    onIngredientRemoved: ingreName =>
-      dispatch(actions.removeIngredient(ingreName)),
-    onInitIngredients: () => dispatch(actions.initIngredients()),
-    onInitPurchase: () => dispatch(actions.purchaseInit())
-  };
-};
+const mapDispatchToProps = dispatch => ({
+  onIngredientAdded: ingreName => dispatch(actions.addIngredient(ingreName)),
+  onIngredientRemoved: ingreName =>
+    dispatch(actions.removeIngredient(ingreName)),
+  onInitIngredients: () => dispatch(actions.initIngredients()),
+  onInitPurchase: () => dispatch(actions.purchaseInit()),
+  onSetAuthRedirectPath: path => dispatch(actions.setAuthRedirectPath(path))
+});
 
 export default connect(
   mapStateToProps,

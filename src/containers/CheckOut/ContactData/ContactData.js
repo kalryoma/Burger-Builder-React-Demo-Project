@@ -72,7 +72,7 @@ class ContactData extends Component {
       price: this.props.price,
       orderData: formData
     };
-    this.props.onOrder(order);
+    this.props.onOrder(order, this.props.token);
   };
 
   checkValidity(value, rules) {
@@ -143,12 +143,13 @@ const mapStateToProps = state => {
   return {
     ingredients: state.builder.ingredients,
     price: state.builder.totalPrice,
-    error: state.order.error
+    error: state.order.error,
+    token: state.auth.token
   };
 };
 
 const mapDispatchToProps = dispatch => ({
-  onOrder: orderData => dispatch(orderActions.purchase(orderData))
+  onOrder: (orderData, token) => dispatch(orderActions.purchase(orderData, token))
 });
 
 export default connect(
