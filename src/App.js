@@ -38,7 +38,7 @@ class App extends Component {
               <React.Fragment>
                 <Route path="/auth" component={asyncAuth} />
                 <Route path="/" exact component={Builder} />
-                {this.props.location.pathname !== "/" &&
+                  {this.props.location && this.props.location.pathname !== "/" &&
                 this.props.location.pathname !== "/auth" ? (
                   <Redirect to="/" />
                 ) : null}
