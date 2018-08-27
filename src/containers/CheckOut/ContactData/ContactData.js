@@ -70,7 +70,8 @@ class ContactData extends Component {
     const order = {
       ingredients: this.props.ingredients,
       price: this.props.price,
-      orderData: formData
+      orderData: formData,
+      userId: this.props.userId
     };
     this.props.onOrder(order, this.props.token);
   };
@@ -139,17 +140,17 @@ class ContactData extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    ingredients: state.builder.ingredients,
-    price: state.builder.totalPrice,
-    error: state.order.error,
-    token: state.auth.token
-  };
-};
+const mapStateToProps = state => ({
+  ingredients: state.builder.ingredients,
+  price: state.builder.totalPrice,
+  error: state.order.error,
+  token: state.auth.token,
+  userId: state.auth.userId
+});
 
 const mapDispatchToProps = dispatch => ({
-  onOrder: (orderData, token) => dispatch(orderActions.purchase(orderData, token))
+  onOrder: (orderData, token) =>
+    dispatch(orderActions.purchase(orderData, token))
 });
 
 export default connect(
